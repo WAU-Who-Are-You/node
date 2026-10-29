@@ -94,10 +94,10 @@ A node is **untrusted by design**. Clients and other nodes must assume any node 
 - **Impersonating another node**: identities are keys (`nodeId = hash(pubkey)`). The handshake signs the full transcript (version, ids, endpoints, nonces), and frames are signed and bound to their recipient.
 - **Registering a domain it doesn't serve**: the registry challenges the endpoint back. Private, loopback and metadata addresses are refused (SSRF), and errors stay generic.
 - **Replay**: fresh nonces in handshakes, `(id, ts)` per frame, and `aud`-bound registrations and heartbeats.
-- **Resource exhaustion**: caps on pending handshakes (64 total / 4 per IP), peers, clients per IP, frame size (64 KB) and rate (600/10 s per peer), send backpressure, bounded caches, and HTTP header/request timeouts.
+- **Resource exhaustion**: caps on pending handshakes (64 total / 4 per IP), peers, clients per IP, frame size (256 KB, enough for one relayed file chunk) and rate (5000 frames / 10 s per peer), send backpressure, bounded caches, and HTTP header/request timeouts.
 - **Reading chat**: it only ever handles E2EE ciphertext. Ciphertext and membership commits go to authenticated members only, never to observers.
 
-**Enforced by the clients, not by nodes** (the frontend in `source/src/lib/trust.ts`):
+**Enforced by the clients, not by nodes** (the app's `src/lib/trust.ts`):
 
 - Each room's root of trust is the owner's ECDSA key. Its fingerprint rides in the invite link fragment (`wau2_….<fp>` / `wau3_….<fp>`), which never reaches a server.
 - Join requests are signed over **both** identity keys, so a node can't swap the ECDH key the room key gets wrapped to. Answers are signed too.
