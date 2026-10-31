@@ -18,6 +18,7 @@ x-hardening: &hardening
 services:
   node:
     <<: *hardening
+    user: bun   # unprivileged from the start; the entrypoint skips its root step
     build: .
     environment:
       NODE_PUBLIC_URL: https://${NODE_DOMAIN:?set NODE_DOMAIN}
