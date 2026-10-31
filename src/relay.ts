@@ -46,6 +46,8 @@ import {
   MAX_FILE_CHUNK_B64,
   MAX_FILE_CHUNKS_PER_WINDOW,
   MAX_FILE_NAME_CHARS,
+  MAX_JOIN_ANSWER_CHARS,
+  MAX_KEY_ENVELOPE_CHARS,
 } from './protocol/client'
 import type { NodeConfig } from './config'
 import { ipFrom } from './net'
@@ -434,6 +436,8 @@ function bindSession(s: Session, on: OnFn) {
       if (typeof data.nonce !== 'string' || data.nonce.length > 128) return bad('nonce không hợp lệ')
       if (typeof data.signature !== 'string' || data.signature.length > MAX_PAYLOAD_B64_CHARS)
         return bad('signature không hợp lệ')
+      if (data.sealedNickname !== undefined && (typeof data.sealedNickname !== 'string' || data.sealedNickname.length > 4096))
+        return bad('sealedNickname không hợp lệ')
       if (data.pwdProof !== undefined && (typeof data.pwdProof !== 'string' || data.pwdProof.length > 256))
         return bad('pwdProof không hợp lệ')
       if (!Number.isFinite(data.createdAt) || !Number.isFinite(data.expiresAt)) return bad('thời gian không hợp lệ')
@@ -502,6 +506,8 @@ function bindSession(s: Session, on: OnFn) {
             // forwarded so approvers can verify the request themselves
             signature: data.signature,
             pwdProof: typeof data.pwdProof === 'string' ? data.pwdProof : undefined,
+            // the requester's name, sealed under the room secret — opaque to us
+            sealedNickname: typeof data.sealedNickname === 'string' ? data.sealedNickname : undefined,
           })
         }
       }
@@ -555,7 +561,8 @@ function bindSession(s: Session, on: OnFn) {
         ack?.({ ok: false, code: 'challenge-expired', message: 'Câu hỏi thử thách đã hết hạn' })
         return
       }
-      if (typeof data.payload !== 'string' || data.payload.length === 0 || data.payload.length > 512)
+      // sealed answer (AES-GCM to the owner) — opaque to us
+      if (typeof data.payload !== 'string' || data.payload.length === 0 || data.payload.length > MAX_JOIN_ANSWER_CHARS)
         return
       if (typeof data.signature !== 'string' || data.signature.length > MAX_PAYLOAD_B64_CHARS) return
       ack?.({ ok: true })
@@ -704,7 +711,8 @@ function bindSession(s: Session, on: OnFn) {
         ack?.({ ok: false, code: 'bad-request', message: 'epoch không hợp lệ' })
         return
       }
-      if (typeof data.wrappedKey !== 'string' || data.wrappedKey.length > MAX_PAYLOAD_B64_CHARS) {
+      // an envelope may carry the sealed member roster for a newcomer
+      if (typeof data.wrappedKey !== 'string' || data.wrappedKey.length > MAX_KEY_ENVELOPE_CHARS) {
         ack?.({ ok: false, code: 'bad-request', message: 'wrappedKey không hợp lệ' })
         return
       }

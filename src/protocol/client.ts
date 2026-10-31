@@ -20,6 +20,10 @@ export const MAX_ROOM_NAME_LENGTH = 64
 export const MAX_TEXT_LENGTH = 4_000
 export const MAX_CIPHERTEXT_CHARS = 16_384
 export const MAX_PAYLOAD_B64_CHARS = 8_192
+/** a key envelope carries the sealed member roster (≤ MAX_MEMBERS_PER_ROOM entries) */
+export const MAX_KEY_ENVELOPE_CHARS = 48_000
+/** sealed join answer (≤ 512 chars of text after AES-GCM + b64) */
+export const MAX_JOIN_ANSWER_CHARS = 4_096
 
 export const MAX_JOIN_REQUESTS_PER_WINDOW = 5
 export const RATE_WINDOW_MS = 10 * 60_000
@@ -93,6 +97,8 @@ export type ClientEvent =
       signature: string
       /** PWD rooms: opaque HMAC proving the joiner knows the room PWD (relay is blind to it) */
       pwdProof?: string
+      /** display name sealed under the room secret — `nickname` is sent empty */
+      sealedNickname?: string
     }
   | { type: 'join.challenge'; roomId: string; requestId: string; payload: string }
   | { type: 'join.answer'; roomId: string; requestId: string; payload: string; signature: string }
@@ -200,6 +206,7 @@ export type ServerEvent =
       expiresAt: number
       signature: string
       pwdProof?: string
+      sealedNickname?: string
     }
   | { type: 'join.challenge.received'; requestId: string; payload: string }
   | {
@@ -277,7 +284,10 @@ export interface MembershipCommitPayload {
   action: 'add' | 'remove'
   memberId: string
   identityPublicKey?: IdentityPublicKeyBundle
+  /** legacy plaintext name — new clients send `sealedNickname` instead */
   nickname?: string
+  /** name sealed with sealed.ts memberNameKey(room key of `epoch`) — an epoch every recipient holds */
+  sealedNickname?: { epoch: number; c: string }
   issuedBy: string
   /** issuer's ECDSA public key — must be the pinned owner, or (recovery) the member itself */
   issuerEcdsa: string

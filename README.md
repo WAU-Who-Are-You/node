@@ -119,10 +119,15 @@ A node is **untrusted by design**. Clients and other nodes must assume any node 
 - Challenges, decisions, membership commits and key envelopes are signed by the owner and checked against the pinned fingerprint. Envelopes are bound to room, epoch and recipient, and carry an owner-signed roster.
 - Chat messages are signed by the sender and verified against the member list. Forged or unverifiable input is dropped, never acted on.
 - Secret self-recovery only ever yields keys from members who already know that identity.
+- **What a node can't read** (verified on the wire by the app's `e2e-wire` test, which decodes base64 layers too):
+  - The join **challenge question and answer** are sealed per join request with ECDH between the owner's and the joiner's identity keys, one key per direction. These keys are separate from message keys.
+  - **Display names** travel sealed: in join requests under the room secret, and in commits and rosters under a room-key epoch every recipient holds.
+  - The **room name** never leaves devices (`room.create` carries no name).
+  - **Chat and files** are E2EE.
 
 **Known limits:**
 
-1. Every node sees metadata: room ids, timing, sizes, and connecting IPs.
+1. Every node sees metadata: room ids, member ids and public keys, timing, sizes, and the IPs of clients connected to it.
 2. A node can still **drop, delay or reorder** traffic (availability isn't something E2EE can provide).
 3. Rooms joined via a pre-anchor link pin the owner key on first use (TOFU) during that join.
 4. Relay-level secret recovery still admits anyone holding a v2 link to the relay's member set. They only receive ciphertext they can't read and can't get anything verified.
