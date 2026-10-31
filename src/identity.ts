@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-only
 /**
  * Node identity: Ed25519 keypair persisted at {dataDir}/node-key.json (0600).
  * Losing this file = becoming a different node (new nodeId).

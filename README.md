@@ -76,6 +76,7 @@ docker build -t wau-node .
 | `NODE_FEDERATION` | `on` | `off` = standalone relay: no `/peer`, no registry, no outbound links |
 | `NODE_ALLOW_INSECURE` | `false` | allow `http://` peers (dev/LAN) |
 | `NODE_DEBUG` | `false` | expose `debug.dump` (leaks metadata, dev only) |
+| `NODE_SOURCE_URL` | | where users can get this node's source (shown in `/v1/node/info`). **Required by the license if you modified the node** |
 
 ## Federation: home-node routing
 
@@ -155,3 +156,18 @@ WAU_REGISTRY=http://localhost:4000 WAU_NODE=http://localhost:4101 bun run smoke
 ```
 
 `src/protocol/` is the source of truth for the wire protocol (`network.ts` for node↔registry and node↔node, `client.ts` for client↔node, `crypto.ts` for signatures).
+
+## License
+
+Copyright © 2026 WAU contributors. Every source file states its license on its first line (`SPDX-License-Identifier`).
+
+| Files | License | Why |
+|---|---|---|
+| `src/protocol/*` (wire protocol + signing), `src/net-guard.ts` | **MIT** ([`LICENSE-MIT`](LICENSE-MIT)) | Anyone can build compatible nodes, clients and apps, open or closed |
+| Everything else (the node implementation: relay, peers, routing, registry client, scripts) | **AGPL-3.0-only** ([`LICENSE`](LICENSE)) | Improvements to the node stay open |
+
+What the AGPL asks of node operators: running the node unmodified needs nothing extra. If you run a **modified** node that other people use over the network, §13 requires you to offer those users the complete source of your version. Publish it, set `NODE_SOURCE_URL`, and the node advertises it in `GET /v1/node/info`.
+
+Contributions are accepted under the license of the file they touch, with a DCO sign-off; see [`CONTRIBUTING.md`](CONTRIBUTING.md).
+
+This summary is not legal advice; the license texts govern.

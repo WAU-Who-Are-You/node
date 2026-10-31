@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-only
 /**
  * Negative/abuse checks against a running registry + node.
  *   WAU_REGISTRY=http://localhost:4000 WAU_NODE=http://localhost:4101 bun run smoke

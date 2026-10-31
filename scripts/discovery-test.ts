@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-only
 /**
  * Node discovery: how an entry node finds a room's home by nodeId.
  *   S1  stale endpoint in the invite → registry lookup (self-signed record) → routed

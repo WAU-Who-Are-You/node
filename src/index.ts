@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-only
 /**
  * WAU node — one participant of the decentralized realtime network.
  *
@@ -59,6 +60,9 @@ const httpServer = createServer((req, res) => {
         federation: config.federation,
         /** where clients can list other nodes (null = none configured) */
         registry: config.registryUrl || null,
+        /** source code offer (AGPL-3.0 §13); license of this node */
+        source: config.sourceUrl,
+        license: 'AGPL-3.0-only',
       })
     case '/v1/node/challenge': {
       const nonce = url.searchParams.get('nonce') ?? ''

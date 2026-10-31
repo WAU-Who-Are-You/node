@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * WAU network protocol v1 — node ↔ registry and node ↔ node.
  *

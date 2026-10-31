@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Shared protocol contract between web client and relay service.
  * Server NEVER stores chat content — it only relays ciphertext and manages

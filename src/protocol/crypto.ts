@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * WAU network — crypto primitives (node identity, signatures).
  * Public source of truth for the protocol; the registry imports from here.

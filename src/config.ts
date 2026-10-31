@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-only
 import type { TrustProxy } from './net'
 import { normalizeEndpoint } from './protocol/network'
 
@@ -30,6 +31,19 @@ if (!trustProxy) throw new Error('NODE_TRUST_PROXY must be true|false|loopback')
 const federation = (env.NODE_FEDERATION ?? 'on') === 'on'
 if (!['on', 'off'].includes(env.NODE_FEDERATION ?? 'on')) throw new Error('NODE_FEDERATION must be on|off')
 if (!federation && (registryUrl || env.NODE_PEERS)) throw new Error('NODE_FEDERATION=off cannot be combined with NODE_REGISTRY_URL / NODE_PEERS')
+
+// AGPL-3.0 §13: a MODIFIED node must offer its source to the users it serves over the network
+const sourceUrl = env.NODE_SOURCE_URL || null
+if (sourceUrl) {
+  let ok = false
+  try {
+    const u = new URL(sourceUrl)
+    ok = (u.protocol === 'https:' || (allowInsecure && u.protocol === 'http:')) && !u.username && !u.password && sourceUrl.length <= 255
+  } catch {
+    ok = false
+  }
+  if (!ok) throw new Error('NODE_SOURCE_URL must be an https:// URL (max 255 chars)')
+}
 
 const nodeName = env.NODE_NAME || undefined
 if (nodeName && !/^[\p{L}\p{N} ._-]{1,64}$/u.test(nodeName)) throw new Error('NODE_NAME: 1-64 letters, digits, space . _ -')
@@ -65,6 +79,8 @@ export const config = {
   federation,
   /** expose debug.dump to clients (dev only — leaks room metadata) */
   debug: env.NODE_DEBUG === 'true',
+  /** where users can get this node's source (AGPL-3.0 §13) — required if you run a modified node */
+  sourceUrl,
   software: 'wau-node/0.1.0',
 }
 

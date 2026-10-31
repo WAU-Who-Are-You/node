@@ -21,6 +21,7 @@ RUN bun build src/index.ts --target=bun --minify --outfile /out/wau-node.js
 FROM oven/bun:${BUN_VERSION}-alpine
 WORKDIR /app
 COPY --from=build /out/wau-node.js ./wau-node.js
+COPY LICENSE LICENSE-MIT ./
 # the node's Ed25519 identity lives in /data — losing it = becoming a new node
 ENV NODE_PORT=3003 \
     NODE_DATA_DIR=/data

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-only
 /**
  * Registry client: register on boot (registry calls our /v1/node/challenge
  * back to prove we own the endpoint), then signed heartbeats with load.

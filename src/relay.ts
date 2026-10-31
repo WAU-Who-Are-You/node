@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-only
 /**
  * WAU node — client relay (ported from source/mini-services/relay-service)
  *

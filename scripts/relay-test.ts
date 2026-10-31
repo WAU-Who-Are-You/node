@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-only
 /**
  * Client-relay checks against a running node (protocol used by the frontend).
  *   WAU_NODE=http://localhost:4101 bun run relay-test

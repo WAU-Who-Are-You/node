@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Refuse to dial hosts that are (or resolve to) loopback, private, link-local
  * (cloud metadata), CGNAT, multicast or reserved addresses. Used wherever a
