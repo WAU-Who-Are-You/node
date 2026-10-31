@@ -4,8 +4,9 @@ import { normalizeEndpoint } from './protocol/network'
 
 const env = process.env
 
-const port = Number(env.NODE_PORT ?? 3003)
-if (!Number.isInteger(port) || port < 1 || port > 65535) throw new Error('NODE_PORT invalid')
+// NODE_PORT wins; PaaS hosts (Railway, Render, Fly…) inject PORT
+const port = Number(env.NODE_PORT ?? env.PORT ?? 3003)
+if (!Number.isInteger(port) || port < 1 || port > 65535) throw new Error('NODE_PORT / PORT invalid')
 const allowInsecure = env.NODE_ALLOW_INSECURE === 'true'
 const publicUrl = normalizeEndpoint(env.NODE_PUBLIC_URL ?? `http://localhost:${port}`, allowInsecure)
 if (!publicUrl)
