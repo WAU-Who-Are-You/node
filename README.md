@@ -43,6 +43,21 @@ On start the node prints its `nodeId` and registry status:
 
 **Back up `data/node-key.json`.** Losing it makes you a new node with a new nodeId.
 
+## Docker
+
+```bash
+docker build -t wau-node .
+```
+
+- **Production** (`docker-compose.yml`): the node runs behind Caddy, which gets the HTTPS certificate automatically. Only Caddy is published, so the node trusts its `X-Forwarded-For`.
+  ```bash
+  NODE_DOMAIN=node.example.com NODE_REGISTRY_URL=https://registry.example.com docker compose up -d --build
+  ```
+  This needs DNS for `NODE_DOMAIN` pointing at the host and ports 80/443 open.
+- The image runs as an unprivileged user. The compose file adds a read-only filesystem, drops all capabilities and sets `no-new-privileges`.
+- The identity key lives on the `node-data` volume (`/data`). **Back it up.**
+- Local http testing needs `NODE_ALLOW_INSECURE=true`. Without it, the node refuses to start on an `http://` URL.
+
 ## Configuration (`.env`)
 
 | Variable | Default | |
